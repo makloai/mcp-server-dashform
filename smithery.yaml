@@ -1,0 +1,12 @@
+name: dashform
+description: >
+  Connect AI assistants to Dashform — build and manage AI-powered forms,
+  funnels, quizzes, and lead qualification workflows through MCP.
+vendor: Dashform
+sourceUrl: https://github.com/makloai/mcp-server-dashform
+homepage: https://getaiform.com
+license: MIT
+
+startCommand:
+  type: http
+  url: https://getaiform.com/api/mcp
