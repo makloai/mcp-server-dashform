@@ -2,7 +2,6 @@
 
 Connect AI assistants to [Dashform](https://getaiform.com) — build and manage AI-powered forms, funnels, quizzes, and lead qualification workflows through the Model Context Protocol.
 
-<a href="https://glama.ai/mcp/servers"><img width="380" height="200" alt="Dashform MCP server" src="https://glama.ai/mcp/servers/badge" /></a>
 
 ## Features
 
