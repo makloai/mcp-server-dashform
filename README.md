@@ -1,5 +1,7 @@
 # Dashform MCP Server
 
+[![MCP Queen operational grade](https://mcpqueen.com/badge/io.github.makloai/mcp-server-dashform.svg)](https://mcpqueen.com/s/io.github.makloai/mcp-server-dashform)
+
 Connect AI assistants to [Dashform](https://getaiform.com) — build and manage AI-powered forms, funnels, quizzes, and lead qualification workflows through the Model Context Protocol.
 
 
