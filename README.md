@@ -1,169 +1,114 @@
 # Dashform MCP Server
 
-Connect AI assistants to [Dashform](https://getaiform.com) — build and manage AI-powered forms, funnels, quizzes, and lead qualification workflows through the Model Context Protocol.
+Forms for AI agents. Connect Claude, ChatGPT, Codex, Cursor, or any MCP client to [Dashform](https://getaiform.com) and let it build, publish, and read your forms and the replies they collect.
 
+Tell your assistant the intake you need. It creates the form in Dashform (questions, branching logic, follow-ups, result pages), publishes it with a shareable link, then reads and triages the replies, including each reply's lead score.
 
-## Features
+Dashform MCP is a hosted remote server. There is nothing to install.
 
-- **Form Management** — Create, read, update, and delete forms and AI funnels programmatically
-- **Reply Collection** — Submit and retrieve form responses
-- **AI Lead Qualification** — Use built-in AI to check if a lead is a good fit for a business
-- **Service Marketplace** — Search merchants, services, and categories
-- **Booking** — Check availability and book appointments through AI agents
-- **OAuth 2.1** — Secure authentication with dynamic client registration
+| | |
+|---|---|
+| Endpoint | `https://getaiform.com/api/mcp` |
+| Transport | Streamable HTTP |
+| Authentication | OAuth 2.1 with dynamic client registration (RFC 7591). No API key to copy. |
+| Docs | [getaiform.com/docs/mcp](https://getaiform.com/docs/mcp) |
 
-## Quickstart
+## Connect
 
-Dashform MCP is a hosted remote server. No local installation is required — just add the endpoint URL to your MCP client.
+### Claude
 
-**Endpoint:** `https://getaiform.com/api/mcp`
+Open **Settings > Connectors**, choose **Add custom connector**, name it "Dashform", and paste `https://getaiform.com/api/mcp`. Sign in to Dashform and choose **Allow**.
 
-**Transport:** Streamable HTTP
+### ChatGPT
 
-**Authentication:** OAuth 2.1 with dynamic client registration (RFC 7591)
+Open [ChatGPT Plugins](https://chatgpt.com/plugins) and search for **Dashform**, or choose **Add**, then **Add custom MCP server**, paste the endpoint into **Server URL**, and choose **OAuth**.
 
-### Claude Desktop
+### Codex
 
-Add to your `claude_desktop_config.json`:
-
-```json
-{
-  "mcpServers": {
-    "dashform": {
-      "url": "https://getaiform.com/api/mcp"
-    }
-  }
-}
+```bash
+codex mcp add dashform --url https://getaiform.com/api/mcp
+codex mcp login dashform
 ```
 
-Claude Desktop will handle OAuth authorization automatically.
+### Claude Code
+
+```bash
+claude mcp add --transport http dashform https://getaiform.com/api/mcp
+```
 
 ### Cursor
 
-Add to your Cursor MCP settings (`.cursor/mcp.json`):
+Add Dashform to `~/.cursor/mcp.json`:
 
 ```json
-{
-  "mcpServers": {
-    "dashform": {
-      "url": "https://getaiform.com/api/mcp"
-    }
-  }
-}
+{ "mcpServers": { "dashform": { "url": "https://getaiform.com/api/mcp" } } }
 ```
 
-### VS Code / GitHub Copilot
+### VS Code
 
-Add to your VS Code settings (`.vscode/mcp.json`):
+Add to `.vscode/mcp.json`:
 
 ```json
-{
-  "servers": {
-    "dashform": {
-      "url": "https://getaiform.com/api/mcp"
-    }
-  }
-}
+{ "servers": { "dashform": { "type": "http", "url": "https://getaiform.com/api/mcp" } } }
 ```
 
-### Windsurf
+## Permissions
 
-Add to your `~/.codeium/windsurf/mcp_config.json`:
+Each permission is an OAuth scope. Reading is separate from writing, and the consent screen lets you untick anything the client shouldn't have.
 
-```json
-{
-  "mcpServers": {
-    "dashform": {
-      "serverUrl": "https://getaiform.com/api/mcp"
-    }
-  }
-}
-```
+| Scope | Consent screen shows | Tools it reaches |
+|---|---|---|
+| `forms:read` | Read your forms | `list_forms`, `get_form`, `list_form_revisions`, `get_form_revision` |
+| `forms:write` | Manage your forms | `create_form`, `update_form`, `publish_form`, `delete_form` |
+| `replies:read` | Read your replies | `list_replies`, `get_reply` |
+| `replies:write` | Manage your replies | `create_reply`, `update_reply`, `delete_reply`, `batch_delete_replies` |
+| `offline_access` | Stay connected | Issues a refresh token |
 
-### MCP Inspector
-
-```bash
-npx @modelcontextprotocol/inspector --url https://getaiform.com/api/mcp
-```
+Any granted scope also reaches the Organization tools and the public Marketplace tools. Revoke a connection at any time in Dashform under **Settings > Security**.
 
 ## Tools
 
-### Form Management (requires authentication)
+### Forms
 
-| Tool | Description |
-|------|-------------|
-| `get_user_info` | Get current user profile (userId, organizationId, name, email) |
-| `list_organizations` | List all organizations for a user |
-| `list_forms` | List all forms in an organization with reply counts |
-| `get_form` | Get full form details including config, questions, and theme |
-| `create_form` | Create a new form (structured or dynamic AI type) |
-| `update_form` | Update form config, questions, endings, or theme |
-| `delete_form` | Permanently delete a form and all its data |
-| `create_reply` | Submit a new reply/response to a form |
+| Tool | What it does |
+|---|---|
+| `list_my_organizations` | List the Organizations you belong to |
+| `get_organization` | Get one Organization by id or slug |
+| `list_forms` | List the Forms in an Organization |
+| `get_form` | Get one Form |
+| `create_form` | Create a Form as a private draft, optionally from a template |
+| `update_form` | Change a Form's fields; edits stay a draft until published |
+| `publish_form` | Publish a Form, creating the Revision respondents see |
+| `delete_form` | Permanently delete a Form with its revisions and replies |
+| `list_form_revisions` | List a Form's published Revisions |
+| `get_form_revision` | Get one Revision and the questions it asks |
 
-### Marketplace Discovery (no authentication required)
+### Replies
 
-| Tool | Description |
-|------|-------------|
-| `list_categories` | List marketplace service categories with merchant counts |
-| `search_merchants` | Search merchants by keyword, category, or location |
-| `search_services` | Search services across all merchants with price filtering |
+| Tool | What it does |
+|---|---|
+| `list_replies` | List Replies, filtered by lead score verdict, seen time, or completion |
+| `get_reply` | Get one Reply with its answers and lead score |
+| `create_reply` | Submit a Reply to a published Form |
+| `update_reply` | Mark a Reply seen or override its lead score |
+| `delete_reply` | Delete one Reply |
+| `batch_delete_replies` | Delete up to 100 Replies under one Form |
 
-### Agent Booking (no authentication required)
+### Marketplace
 
-| Tool | Description |
-|------|-------------|
-| `get_business_info` | Get business profile for a published funnel |
-| `get_services` | List available services for a funnel |
-| `get_form_questions` | Get question schema (keys, types, options) for a funnel |
-| `check_fit` | AI-powered lead qualification — checks if a lead matches the business criteria |
-| `get_availability` | Get booking availability and scheduling link |
-| `book_appointment` | Submit a lead record and book an appointment |
+| Tool | What it does |
+|---|---|
+| `list_marketplace_categories` | List the categories merchants are listed under |
+| `list_marketplace_profiles` | Find merchants by category, city, or name |
+| `list_marketplace_services` | Find services across merchants |
+| `get_marketplace_profile` | Get one merchant's profile, services, and booking link |
+| `check_marketplace_fit` | Score a lead against a merchant's own qualification rules |
 
-## Authentication
+## Example prompts
 
-Dashform MCP uses **OAuth 2.1** with the Authorization Code flow and supports **dynamic client registration** (RFC 7591). This means MCP clients like Claude Desktop and Cursor can automatically register and authenticate without manual API key setup.
-
-### OAuth Endpoints
-
-| Endpoint | URL |
-|----------|-----|
-| Authorization | `https://getaiform.com/oauth/authorize` |
-| Token | `https://getaiform.com/api/auth/oauth2/token` |
-| Client Registration | `https://getaiform.com/api/auth/oauth2/register` |
-| Resource Metadata | `https://getaiform.com/.well-known/oauth-protected-resource` |
-| MCP Discovery | `https://getaiform.com/.well-known/mcp.json` |
-
-### Scopes
-
-| Scope | Description |
-|-------|-------------|
-| `openid` | OpenID Connect identity |
-| `profile` | User profile information |
-| `email` | User email address |
-| `read:forms` | Read forms and form data |
-| `write:forms` | Create and update forms |
-| `read:submissions` | Read form submissions |
-| `write:submissions` | Create form submissions |
-| `read:webhooks` | Read webhook configurations |
-| `offline_access` | Refresh token for long-lived sessions |
-
-## MCP Discovery
-
-The server exposes a discovery endpoint at `/.well-known/mcp.json` that returns the server manifest, including all available tools and the endpoint URL.
-
-```bash
-curl https://getaiform.com/.well-known/mcp.json
-```
-
-## Use Cases
-
-- **Build forms with natural language** — "Create a customer feedback form with a rating scale and open-ended questions"
-- **Manage forms at scale** — List, update, or delete forms across organizations
-- **Collect responses** — Submit test data or integrate with automated pipelines
-- **AI-powered lead qualification** — "Check if this lead is a good fit for my consulting business"
-- **Service discovery** — "Find yoga studios in San Francisco that offer private sessions"
-- **Appointment booking** — "Book a free consultation with the nearest available therapist"
+- "Create a client intake form for my design agency that asks about budget, timeline, and scope, then publish it and give me the link."
+- "Summarize this week's replies to my newest form and list the leads with the highest score."
+- "Add a question about company size to my lead qualification form and republish it."
 
 ## Support
 

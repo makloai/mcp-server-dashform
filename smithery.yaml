@@ -1,7 +1,7 @@
 name: dashform
 description: >
-  Connect AI assistants to Dashform — build and manage AI-powered forms,
-  funnels, quizzes, and lead qualification workflows through MCP.
+  Forms for AI agents. Build, publish, and read forms and their replies
+  from any MCP client.
 vendor: Dashform
 sourceUrl: https://github.com/makloai/mcp-server-dashform
 homepage: https://getaiform.com
